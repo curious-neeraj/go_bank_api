@@ -9,8 +9,64 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// func apiServer() {
+// 	fmt.Println("Initialize API Server!")
+// }
+
+type APIServer struct {
+	listenAddress string
+}
+
+func NewAPIServer(listenAddress string) *APIServer {
+	return &APIServer{
+		listenAddress: listenAddress,
+	}
+}
+
+func (s *APIServer) Run() {
+	router := mux.NewRouter()
+
+	router.HandleFunc("/account", makeHTTPHandleFunc(s.handleAccount))
+	router.HandleFunc("/account/{id}", makeHTTPHandleFunc(s.handleGetAccount))
+
+	log.Println("API Server running on port ", s.listenAddress)
+	http.ListenAndServe(s.listenAddress, router)
+}
+
+func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error {
+	switch r.Method {
+	case "GET":
+		return s.handleGetAccount(w, r)
+	case "POST":
+		return s.handleCreateAccount(w, r)
+	case "DELETE":
+		return s.handleDeleteAccount(w, r)
+	default:
+		return fmt.Errorf("%s - method not allowed", r.Method)
+	}
+}
+
+func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) error {
+	account := NewAccount("Neeraj", "Jain")
+	return WriteJSON(w, http.StatusOK, account)
+
+	// return nil
+}
+
+func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func (s *APIServer) handleDeleteAccount(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+// func (s *APIServer) handleTransaction(w http.ResponseWriter, r *http.Request) error {
+// 	return nil
+// }
+
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
 
 	return json.NewEncoder(w).Encode(v)
@@ -31,58 +87,3 @@ func makeHTTPHandleFunc(f apiFunc) http.HandlerFunc {
 		}
 	}
 }
-
-// func apiServer() {
-// 	fmt.Println("Initialize API Server!")
-// }
-
-type APIServer struct {
-	listenAddress string
-}
-
-func NewAPIServer(listenAddress string) *APIServer {
-	return &APIServer{
-		listenAddress: listenAddress,
-	}
-}
-
-func (s *APIServer) Run() {
-	router := mux.NewRouter()
-
-	router.HandleFunc("/account", makeHTTPHandleFunc(s.handleAccount))
-
-	log.Println("API Server running on port: ", s.listenAddress)
-	http.ListenAndServe(s.listenAddress, router)
-}
-
-func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error {
-	switch r.Method {
-	case "GET":
-		return s.handleGetAccount(w, r)
-	case "POST":
-		return s.handleCreateAccount(w, r)
-	case "DELETE":
-		return s.handleDeleteAccount(w, r)
-	default:
-		return fmt.Errorf("%s - method not allowed", r.Method)
-	}
-}
-
-func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) error {
-	// account := NewAccount("Neeraj", "Jain")
-	// return WriteJSON(w, http.StatusOK, account)
-
-	return nil
-}
-
-func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
-	return nil
-}
-
-func (s *APIServer) handleDeleteAccount(w http.ResponseWriter, r *http.Request) error {
-	return nil
-}
-
-// func (s *APIServer) handleTransaction(w http.ResponseWriter, r *http.Request) error {
-// 	return nil
-// }
