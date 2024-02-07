@@ -33,3 +33,20 @@ func NewPostgresStore() (*PostgresStore, error) {
 		db: db,
 	}, nil
 }
+
+// implement functions to make interface valid
+func (s *PostgresStore) CreateAccount(*Account) error {
+	return nil
+}
+
+func (s *PostgresStore) GetAccountById(id int) (*Account, error) {
+	return nil, nil
+}
+
+func (s *PostgresStore) UpdateAccount(id int) error {
+	return nil
+}
+
+func (s *PostgresStore) DeleteAccount(int) error {
+	return nil
+}
