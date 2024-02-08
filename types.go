@@ -7,6 +7,7 @@ type Account struct {
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
 	Balance   int64  `json:"balance"`
+	AcNumber  int64  `json:"acNumber"`
 }
 
 func NewAccount(firstName, lastName string) *Account {
@@ -14,5 +15,6 @@ func NewAccount(firstName, lastName string) *Account {
 		ID:        int64(rand.Intn(10000)),
 		FirstName: firstName,
 		LastName:  lastName,
+		AcNumber:  int64(rand.Intn(10000)),
 	}
 }
