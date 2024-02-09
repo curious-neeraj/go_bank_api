@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	_ "github.com/lib/pq"
@@ -9,6 +10,7 @@ import (
 
 type Storage interface {
 	CreateAccount(*Account) error
+	GetAccounts() ([]*Account, error)
 	GetAccountById(int) (*Account, error)
 	UpdateAccount(int) error
 	DeleteAccount(int) error
@@ -53,8 +55,50 @@ func (s *PostgresStore) CreateAccountTable() error {
 }
 
 // implement functions to make interface valid
-func (s *PostgresStore) CreateAccount(*Account) error {
+func (s *PostgresStore) CreateAccount(ac *Account) error {
+
+	query := `INSERT INTO account 
+	(first_name, last_name, balance, ac_number, created_at)
+	VALUES
+	($1, $2, $3, $4, $5)`
+
+	resp, err := s.db.Query(query,
+		ac.FirstName,
+		ac.LastName,
+		ac.Balance,
+		ac.AcNumber,
+		ac.CreatedAt)
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%+v \n", resp)
 	return nil
+}
+
+func (s *PostgresStore) GetAccounts() ([]*Account, error) {
+	rows, err := s.db.Query("select * from account")
+	if err != nil {
+		return nil, err
+	}
+
+	accounts := []*Account{}
+	for rows.Next() {
+		account := new(Account)
+		if err := rows.Scan(
+			&account.ID,
+			&account.FirstName,
+			&account.LastName,
+			&account.Balance,
+			&account.AcNumber,
+			&account.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		accounts = append(accounts, account)
+	}
+	return accounts, nil
 }
 
 func (s *PostgresStore) GetAccountById(id int) (*Account, error) {
