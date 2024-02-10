@@ -12,3 +12,4 @@ Backend APIs for banking system using Golang.
 - [ ] Dockerised application
 - [ ] Prod level logging
 - [ ] Unit Tests
+- [ ] Add Swagger support!
