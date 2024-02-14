@@ -119,11 +119,7 @@ func (s *PostgresStore) UpdateAccount(id int) error {
 
 func (s *PostgresStore) DeleteAccount(id int) error {
 	_, err := s.db.Query("delete from account where id = $1", id)
-	if err != nil {
-		return err
-	}
-
-	return fmt.Errorf("account with `id = %d` not found", id)
+	return err
 }
 
 func scanAccount(rows *sql.Rows) (*Account, error) {

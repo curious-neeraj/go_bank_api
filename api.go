@@ -27,6 +27,7 @@ func (s *APIServer) Run() {
 
 	router.HandleFunc("/account", makeHTTPHandleFunc(s.handleAccount))
 	router.HandleFunc("/account/{id}", makeHTTPHandleFunc(s.handleGetAccountById))
+	router.HandleFunc("/transfer", makeHTTPHandleFunc(s.handleTransaction))
 
 	log.Println("API Server running on port ", s.listenAddress)
 	http.ListenAndServe(s.listenAddress, router)
@@ -70,7 +71,6 @@ func (s *APIServer) handleGetAccountById(w http.ResponseWriter, r *http.Request)
 	default:
 		return fmt.Errorf("%s - method not allowed", r.Method)
 	}
-
 }
 
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
@@ -100,9 +100,15 @@ func (s *APIServer) handleDeleteAccount(w http.ResponseWriter, r *http.Request) 
 	return WriteJSON(w, http.StatusOK, map[string]int{"deleted": id})
 }
 
-// func (s *APIServer) handleTransaction(w http.ResponseWriter, r *http.Request) error {
-// 	return nil
-// }
+func (s *APIServer) handleTransaction(w http.ResponseWriter, r *http.Request) error {
+	transferReq := new(TransferRequest)
+	if err := json.NewDecoder(r.Body).Decode(transferReq); err != nil {
+		return err
+	}
+	defer r.Body.Close()
+
+	return WriteJSON(w, http.StatusOK, transferReq)
+}
 
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
 	w.Header().Add("Content-Type", "application/json")

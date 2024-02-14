@@ -18,6 +18,11 @@ type CreateAccountRequest struct {
 	LastName  string `json:"lastName"`
 }
 
+type TransferRequest struct {
+	ToAccount int `json:"toAccount"`
+	Amount    int `json:"amount" `
+}
+
 func NewAccount(firstName, lastName string) *Account {
 	return &Account{
 		FirstName: firstName,
