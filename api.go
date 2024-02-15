@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 )
 
@@ -26,7 +27,7 @@ func (s *APIServer) Run() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/account", makeHTTPHandleFunc(s.handleAccount))
-	router.HandleFunc("/account/{id}", makeHTTPHandleFunc(s.handleGetAccountById))
+	router.HandleFunc("/account/{id}", withJWTAuth(makeHTTPHandleFunc(s.handleGetAccountById)))
 	router.HandleFunc("/transfer", makeHTTPHandleFunc(s.handleTransaction))
 
 	log.Println("API Server running on port ", s.listenAddress)
@@ -115,6 +116,32 @@ func WriteJSON(w http.ResponseWriter, status int, v any) error {
 	w.WriteHeader(status)
 
 	return json.NewEncoder(w).Encode(v)
+}
+
+func withJWTAuth(handlerFunc http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Calling JWT Auth Middleware...")
+
+		tokenString := r.Header.Get("jwt-token")
+		_, err := validateJWT(tokenString)
+		if err != nil {
+			WriteJSON(w, http.StatusForbidden, ApiError{Error: "Invalid token"})
+			return
+		}
+		handlerFunc(w, r)
+	}
+}
+
+func validateJWT(tokenString string) (*jwt.Token, error) {
+
+	secret := "SecretThatYouShouldSaveAsEnvVar"
+	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return []byte(secret), nil
+	})
 }
 
 type ApiError struct {
