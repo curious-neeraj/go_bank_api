@@ -5,7 +5,7 @@ Backend APIs for banking system using Golang.
 
 - [ ] Basic functionalities - CRUD operations
 - [ ] Proper connection with DB (Postgres/MySQL)
-- [ ] User Authentication (maybe JWT)
+- [ ] User Authentication using JWT
 
 ## Good to Have Features :
 
