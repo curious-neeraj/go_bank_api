@@ -1,5 +1,5 @@
-# APIs using Golang
-Backend APIs for banking system using Golang.
+# Banking API using Golang
+Backend API for banking system using Golang.
 
 ## Expectations :
 
