@@ -1,5 +1,5 @@
 # Banking API using Golang
-Backend API for banking system using Golang with Auth and proper db connection.
+Backend APIs for banking system using Golang with JWT Auth and proper db connection.
 
 ## Expectations :
 
